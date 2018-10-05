@@ -1,6 +1,10 @@
 package com.bilygine.analyzer.steps;
 
 import com.bilygine.analyzer.analyze.Status;
+import com.bilygine.analyzer.analyze.result.ResultColumn;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GoogleTranscriptionStep extends TranscriptionStep {
 
@@ -24,7 +28,7 @@ public class GoogleTranscriptionStep extends TranscriptionStep {
      * Run analyze on Google cloud and register all occurence
      */
     @Override
-    public void run() {
+    public void transcript() {
         // TODO: Run Google Cloud analysis
         /** Example with hard-coded values */
         long[] timestamps = new long[] {23, 43, 56, 70};

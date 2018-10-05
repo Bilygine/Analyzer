@@ -1,11 +1,14 @@
 package com.bilygine.analyzer.analyze;
 
 import com.bilygine.analyzer.analyze.result.Result;
+import com.bilygine.analyzer.analyze.result.ResultColumn;
+import com.google.common.util.concurrent.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.List;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class DefaultAnalyze implements Analyze {
@@ -17,7 +20,7 @@ public class DefaultAnalyze implements Analyze {
     /** Status */
     private Status status;
     /** Executor service */
-    private Executor executor = Executors.newSingleThreadExecutor();
+    private ExecutorService executor = Executors.newSingleThreadExecutor();
     /** Result */
     private Result result;
 
@@ -71,13 +74,27 @@ public class DefaultAnalyze implements Analyze {
 
     @Override
     public void run() {
+        ListeningExecutorService listeningExecutor = MoreExecutors.listeningDecorator(executor);
+        /** Execute steps */
         for (Step currentStep : this.steps) {
             LOGGER.debug("[STEP_START]", currentStep.getName());
-            /** Execute steps */
-            executor.execute(currentStep);
-            /** Add all columns **/
-            this.result.addColumns(currentStep.getResultColumns());
+            ListenableFuture<List<ResultColumn>> listenableFuture = listeningExecutor.submit(currentStep);
+            Futures.addCallback(listenableFuture, new FutureCallback<List<ResultColumn>>() {
+                @Override
+                public void onSuccess(@Nullable List<ResultColumn> resultColumns) {
+                    DefaultAnalyze.this.result.addColumns(resultColumns);
+                }
+
+                @Override
+                public void onFailure(Throwable throwable) {
+                    LOGGER.error(throwable);
+                }
+            }, executor);
+
         }
+        /** Display concat results */   
         this.result.printResults();
+
+        executor.shutdown();
     }
 }

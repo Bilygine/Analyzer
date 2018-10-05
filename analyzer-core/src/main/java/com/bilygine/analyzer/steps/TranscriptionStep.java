@@ -11,17 +11,9 @@ public abstract class TranscriptionStep implements Step {
     private ResultColumn<String> words = new ResultColumn<>("words");
     private ResultColumn<Long> timestamps = new ResultColumn<>("timestamps");
 
-    /**
-     * Return columns as result
-     * @return
-     */
-    @Override
-    public List<ResultColumn> getResultColumns() {
-        return new ArrayList<ResultColumn>(){{
-            add(words);
-            add(timestamps);
-        }};
-    }
+
+    /** Entry point for all transcript implementation */
+    public abstract void transcript();
 
     /**
      * Register an occurence
@@ -49,4 +41,18 @@ public abstract class TranscriptionStep implements Step {
         return this.timestamps;
     }
 
+    /**
+     *
+     * @return List of ResultColumns
+     */
+    @Override
+    public List<ResultColumn> call() {
+        /** Execute transcription **/
+        this.transcript();
+        /** Return columns */
+        return new ArrayList<ResultColumn>(){{
+            add(words);
+            add(timestamps);
+        }};
+    }
 }
