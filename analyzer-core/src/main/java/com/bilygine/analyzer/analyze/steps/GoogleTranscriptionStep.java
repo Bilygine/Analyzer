@@ -1,10 +1,6 @@
-package com.bilygine.analyzer.steps;
+package com.bilygine.analyzer.analyze.steps;
 
 import com.bilygine.analyzer.analyze.Status;
-import com.bilygine.analyzer.analyze.result.ResultColumn;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class GoogleTranscriptionStep extends TranscriptionStep {
 

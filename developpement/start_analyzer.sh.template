@@ -1,5 +1,6 @@
 # Bilygine - GPE - ETNA
-#export JAVA_HOME=/usr/bin/java
+#OSX
+#export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
 
 ### Log4j2
 export LOG4J_FILE=conf/log4j2.xml

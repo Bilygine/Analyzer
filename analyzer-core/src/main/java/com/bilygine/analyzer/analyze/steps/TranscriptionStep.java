@@ -1,4 +1,4 @@
-package com.bilygine.analyzer.steps;
+package com.bilygine.analyzer.analyze.steps;
 
 import com.bilygine.analyzer.analyze.Step;
 import com.bilygine.analyzer.analyze.result.ResultColumn;

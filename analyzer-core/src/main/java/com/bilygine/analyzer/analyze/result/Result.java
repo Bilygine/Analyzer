@@ -4,6 +4,7 @@ import java.util.*;
 
 public class Result {
 
+    
     /** All columns from each steps */
     private List<ResultColumn> columns = new ArrayList<>();
 

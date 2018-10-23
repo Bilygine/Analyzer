@@ -74,6 +74,8 @@ public class DefaultAnalyze implements Analyze {
 
     @Override
     public void run() {
+        AnalyzeMetadata metadata = new AnalyzeMetadata();
+        metadata.setStart(System.currentTimeMillis());
         ListeningExecutorService listeningExecutor = MoreExecutors.listeningDecorator(executor);
         /** Execute steps */
         for (Step currentStep : this.steps) {
@@ -95,6 +97,8 @@ public class DefaultAnalyze implements Analyze {
         /** Display concat results */   
         this.result.printResults();
 
+        /** Analyze finished */
+        metadata.setEnd(System.currentTimeMillis());
         executor.shutdown();
     }
 }
