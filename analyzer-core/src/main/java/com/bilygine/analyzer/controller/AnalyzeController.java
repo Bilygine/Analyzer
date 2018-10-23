@@ -21,6 +21,7 @@ public class AnalyzeController implements Controller {
 	@Override
 	public void register() {
 		Spark.post("/analyze/execute", (req, res) -> execute(req, res), Json::toJson);
+		System.out.println("Yes registerer");
 	}
 
 	private String execute(Request request, Response response) {
@@ -38,7 +39,7 @@ public class AnalyzeController implements Controller {
 		Analyze analyze = new DefaultAnalyze(steps);
 		analyze.run();
 
-		return "";
+		return "bonjour monsieurs";
 	}
 
 
