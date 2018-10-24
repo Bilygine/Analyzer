@@ -5,8 +5,8 @@ import com.bilygine.analyzer.analyze.result.ResultColumn;
 import com.google.common.util.concurrent.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -79,12 +79,13 @@ public class DefaultAnalyze implements Analyze {
         ListeningExecutorService listeningExecutor = MoreExecutors.listeningDecorator(executor);
         /** Execute steps */
         for (Step currentStep : this.steps) {
-            LOGGER.debug("[STEP_START]", currentStep.getName());
+            LOGGER.error("[STEP_START]", currentStep.getName());
             ListenableFuture<List<ResultColumn>> listenableFuture = listeningExecutor.submit(currentStep);
             Futures.addCallback(listenableFuture, new FutureCallback<List<ResultColumn>>() {
                 @Override
                 public void onSuccess(@Nullable List<ResultColumn> resultColumns) {
                     DefaultAnalyze.this.result.addColumns(resultColumns);
+
                 }
 
                 @Override
@@ -94,11 +95,12 @@ public class DefaultAnalyze implements Analyze {
             }, executor);
 
         }
-        /** Display concat results */   
-        this.result.printResults();
+
+        /** Display concat results */
+        DefaultAnalyze.this.result.printResults();
 
         /** Analyze finished */
         metadata.setEnd(System.currentTimeMillis());
-        executor.shutdown();
+       // executor.shutdown();
     }
 }

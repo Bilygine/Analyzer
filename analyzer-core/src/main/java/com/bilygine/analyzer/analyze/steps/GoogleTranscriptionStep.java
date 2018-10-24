@@ -39,7 +39,7 @@ public class GoogleTranscriptionStep extends TranscriptionStep {
                     RecognitionConfig.newBuilder()
                             .setEncoding(RecognitionConfig.AudioEncoding.FLAC)
                             .setLanguageCode("fr-FR")
-                            .setSampleRateHertz(16000)
+                            .setSampleRateHertz(48000)
                             .setEnableWordTimeOffsets(true)
                             .build();
             RecognitionAudio audio = RecognitionAudio.newBuilder().setUri(this.gsFilePath).build();

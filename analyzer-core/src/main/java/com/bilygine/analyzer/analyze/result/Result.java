@@ -37,7 +37,11 @@ public class Result {
     /**
      * Temp. method to display results
      */
+
     public void printResults() {
+        ResultColumn column = this.columns.stream().max(Comparator.comparing(ResultColumn::size)).orElse(null);
+        if (column == null)
+            return;
         int maxSize = this.columns.stream()
                 .max(Comparator.comparing(ResultColumn::size))
                 .get()
