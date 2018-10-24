@@ -2,28 +2,33 @@ package com.bilygine.analyzer.analyze;
 
 import com.bilygine.analyzer.analyze.result.Result;
 import com.bilygine.analyzer.analyze.result.ResultColumn;
+import com.bilygine.analyzer.entity.model.AudioMetadata;
 import com.google.common.util.concurrent.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class DefaultAnalyze implements Analyze {
 
     /** Logger */
-    private static final Logger LOGGER = LogManager.getLogger(DefaultAnalyze.class);
+    private transient static final Logger LOGGER = LogManager.getLogger(DefaultAnalyze.class);
+	/** UUID */
+	private String uniqueID;
     /** Steps queue */
     private List<Step> steps;
     /** Status */
     private Status status;
     /** Executor service */
-    private ExecutorService executor = Executors.newSingleThreadExecutor();
+    private transient ExecutorService executor = Executors.newSingleThreadExecutor();
     /** Result */
     private Result result;
-
+	/** Metadata */
+	private AnalyzeMetadata metadata = new AnalyzeMetadata();
     /**
      * @param steps
      */
@@ -31,6 +36,7 @@ public class DefaultAnalyze implements Analyze {
         this.steps = steps;
         this.status = Status.NOT_RUN;
         this.result = new Result();
+        this.uniqueID = UUID.randomUUID().toString();
     }
 
     @Override
@@ -64,7 +70,7 @@ public class DefaultAnalyze implements Analyze {
 
     @Override
     public AnalyzeMetadata getMetadata() {
-        return null;
+        return this.metadata;
     }
 
     @Override
@@ -103,4 +109,8 @@ public class DefaultAnalyze implements Analyze {
         metadata.setEnd(System.currentTimeMillis());
        // executor.shutdown();
     }
+
+    public String getUniqueID () {
+    	return this.uniqueID;
+	}
 }

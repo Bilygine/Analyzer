@@ -46,4 +46,9 @@ public interface Analyze extends Runnable {
      */
     void run();
 
+    /**
+     * UniqueID
+     */
+    String getUniqueID();
+
 }

@@ -1,46 +1,41 @@
 package com.bilygine.analyzer.controller;
 
 import com.bilygine.analyzer.analyze.Analyze;
-import com.bilygine.analyzer.analyze.DefaultAnalyze;
-import com.bilygine.analyzer.analyze.Step;
-import com.bilygine.analyzer.analyze.steps.GoogleTranscriptionStep;
+import com.bilygine.analyzer.analyze.AnalyzeService;
 import com.bilygine.analyzer.entity.json.input.ExecuteAnalyzeInput;
+import com.bilygine.analyzer.entity.model.AudioMetadata;
 import com.bilygine.analyzer.io.Json;
 import spark.Request;
-import spark.Response;
 import spark.Spark;
 
-import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public class AnalyzeController implements Controller {
 
 	//private final AnalyzeService
+	// TODO: Here an analyze service and not Singleton
 
 	@Override
 	public void register() {
-		Spark.post("/analyze/execute", (req, res) -> execute(req, res), Json::toJson);
-		System.out.println("Yes registerer");
+		Spark.post("/analyze/execute", (req, res) -> execute(req), Json::toJson);
+		Spark.get("/analyze", (req, res) -> getAnalyzes(req), Json::toJson);
 	}
 
-	private String execute(Request request, Response response) {
+	private String execute(Request request) {
 		String body = request.body();
 		ExecuteAnalyzeInput analyzeInput = Json.fromJson(body, ExecuteAnalyzeInput.class);
+		AudioMetadata audioMetadata = analyzeInput.getAudioMetadata();
 		String path = analyzeInput.getPath();
 
-		/** Create steps list */
-		List<Step> steps = new ArrayList<>();
-		/** Step - 3 | Transcription with Google */
-		steps.add(new GoogleTranscriptionStep(path));
-		/** Step - 4 | Build Results */
+		AnalyzeService.get().executeAnalyze(path, audioMetadata);
 
-		/** Analyze **/
-		Analyze analyze = new DefaultAnalyze(steps);
-		analyze.run();
-
-		return "bonjour monsieurs";
+		return "OK";
 	}
 
+	public List<Analyze> getAnalyzes(Request req) {
+		return AnalyzeService.get().getAnalyzes();
+	}
 
 }
