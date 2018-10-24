@@ -33,22 +33,31 @@ public class Result {
         return this.columns;
     }
 
+    /**
+     * @return Largest column
+     */
+    public ResultColumn getHiggestColumn() {
+        return this.columns.stream()
+                .max(Comparator.comparing(ResultColumn::size))
+                .orElse(null);
+    }
+
+    public int getMaxColumnSize() {
+        ResultColumn higgest = this.getHiggestColumn();
+        if (higgest == null)
+            return 0;
+        return  higgest.size();
+    }
 
     /**
      * Temp. method to display results
      */
 
     public void printResults() {
-        ResultColumn column = this.columns.stream().max(Comparator.comparing(ResultColumn::size)).orElse(null);
+        ResultColumn column = this.getHiggestColumn();
         if (column == null)
             return;
-        int maxSize = this.columns.stream()
-                .max(Comparator.comparing(ResultColumn::size))
-                .get()
-                .size();
-        for (int i = 0; i < maxSize; i++)  {
-            printLine(i);
-        }
+        for (int i = 0; i < column.size(); i++)  { printLine(i); }
     }
 
     public void printLine(int index) {

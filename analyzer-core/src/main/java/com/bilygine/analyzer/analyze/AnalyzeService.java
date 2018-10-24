@@ -1,10 +1,10 @@
 package com.bilygine.analyzer.analyze;
 
 import com.bilygine.analyzer.analyze.steps.GoogleTranscriptionStep;
+import com.bilygine.analyzer.entity.error.AnalyzerError;
 import com.bilygine.analyzer.entity.model.AudioMetadata;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -37,6 +37,13 @@ public class AnalyzeService {
 
 	public List<Analyze> getAnalyzes() {
 		return new ArrayList(this.all.values());
+	}
+
+	public Analyze findAnalyzeById(String id) {
+		if (!this.all.containsKey(id)) {
+			throw new AnalyzerError("Unknown analyze ID");
+		}
+		return all.get(id);
 	}
 
 	public static AnalyzeService get() {

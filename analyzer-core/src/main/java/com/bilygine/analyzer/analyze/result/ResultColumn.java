@@ -57,6 +57,14 @@ public class ResultColumn<T> {
     }
 
     /**
+     * Get value at index
+     * @return value at Index or null
+     */
+    public T valueAt(int index) {
+        return (this.values.size() >= index) ? null : this.values.get(index);
+    }
+
+    /**
      * Gets size
      */
     public int size() {

@@ -8,8 +8,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -17,14 +17,12 @@ public class DefaultAnalyze implements Analyze {
 
     /** Logger */
     private transient static final Logger LOGGER = LogManager.getLogger(DefaultAnalyze.class);
-	/** UUID */
-	private String uniqueID;
-    /** Steps queue */
-    private List<Step> steps;
-    /** Status */
-    private Status status;
     /** Executor service */
     private transient ExecutorService executor = Executors.newSingleThreadExecutor();
+	/** UUID */
+	private String uniqueID;
+    /** Steps status */
+    private HashMap<Step, Status> steps = new HashMap<>();
     /** Result */
     private Result result;
 	/** Metadata */
@@ -33,8 +31,7 @@ public class DefaultAnalyze implements Analyze {
      * @param steps
      */
     public DefaultAnalyze(List<Step> steps) {
-        this.steps = steps;
-        this.status = Status.NOT_RUN;
+        steps.stream().forEach(step -> { this.steps.put(step, Status.NOT_RUN); });
         this.result = new Result();
         this.uniqueID = UUID.randomUUID().toString();
     }
@@ -46,17 +43,26 @@ public class DefaultAnalyze implements Analyze {
 
     @Override
     public Status getStatus() {
-        return (this.status == null) ? Status.NOT_RUN : this.status;
+    	HashMap<Status, Integer> aggregateStatus = new HashMap<>();
+    	for (Status s : Status.values()) aggregateStatus.put(s, 0);
+    	for (Map.Entry<Step, Status> step : this.steps.entrySet()) {
+    		Status status = step.getValue();
+			aggregateStatus.put(status, aggregateStatus.get(status) + 1);
+		}
+		if (aggregateStatus.get(Status.NOT_RUN) == this.steps.size()) return Status.NOT_RUN;
+		if (aggregateStatus.get(Status.FAILURE) > 0) return Status.FAILURE;
+		if (aggregateStatus.get(Status.SUCCEED) == this.steps.size()) return Status.SUCCEED;
+		return Status.PROGRESS;
     }
 
     @Override
     public List<Step> getStep() {
-        return this.steps;
+        return new LinkedList(this.steps.values());
     }
 
     @Override
     public void addStep(Step step) {
-        this.steps.add(step);
+        this.steps.put(step, Status.NOT_RUN);
     }
 
     /**
@@ -65,7 +71,7 @@ public class DefaultAnalyze implements Analyze {
      */
     public Step getCurrentStep() {
         // TODO: return real current steps
-        return steps.stream().findFirst().get();
+        return steps.keySet().stream().findFirst().get();
     }
 
     @Override
@@ -80,35 +86,53 @@ public class DefaultAnalyze implements Analyze {
 
     @Override
     public void run() {
-        AnalyzeMetadata metadata = new AnalyzeMetadata();
         metadata.setStart(System.currentTimeMillis());
         ListeningExecutorService listeningExecutor = MoreExecutors.listeningDecorator(executor);
         /** Execute steps */
-        for (Step currentStep : this.steps) {
-            LOGGER.error("[STEP_START]", currentStep.getName());
+        for (Map.Entry<Step, Status> entry : this.steps.entrySet()) {
+        	Step currentStep = entry.getKey();
+            LOGGER.info("[STEP_START]", currentStep.getName());
             ListenableFuture<List<ResultColumn>> listenableFuture = listeningExecutor.submit(currentStep);
+			this.steps.put(currentStep, Status.PROGRESS);
             Futures.addCallback(listenableFuture, new FutureCallback<List<ResultColumn>>() {
                 @Override
                 public void onSuccess(@Nullable List<ResultColumn> resultColumns) {
                     DefaultAnalyze.this.result.addColumns(resultColumns);
-
+					LOGGER.info("[STEP_END] ", currentStep.getName());
+					steps.put(currentStep, Status.SUCCEED);
+					/** Analyze is done */
+                    if(DefaultAnalyze.this.isDone()) {
+                    	executor.shutdown();
+                    	LOGGER.info("Analyze is done");
+					}
                 }
 
                 @Override
                 public void onFailure(Throwable throwable) {
+					steps.put(currentStep, Status.FAILURE);
                     LOGGER.error(throwable);
                 }
             }, executor);
-
         }
 
+		executor.shutdown();
         /** Display concat results */
         DefaultAnalyze.this.result.printResults();
 
-        /** Analyze finished */
-        metadata.setEnd(System.currentTimeMillis());
-       // executor.shutdown();
+       //
     }
+
+    public boolean isDone() {
+    	return this.steps.values().stream()
+				.filter(step -> step.equals(Status.SUCCEED) || step.equals(Status.FAILURE))
+				.count() == this.steps.size();
+	}
+
+	public boolean hasError() {
+		return this.steps.values().stream()
+				.filter(step -> step.equals(Status.FAILURE))
+				.count() > 0;
+	}
 
     public String getUniqueID () {
     	return this.uniqueID;

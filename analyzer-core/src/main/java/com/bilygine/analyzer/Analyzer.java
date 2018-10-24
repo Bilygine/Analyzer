@@ -19,6 +19,11 @@ public class Analyzer {
 	private static final Logger LOGGER = LogManager.getLogger(Analyzer.class);
 	private static final List<Controller> controllers = Arrays.asList(new AnalyzeController());
     public static void main(String args[]) {
+
+    	/** Init Json */
+		Json.init();
+
+		/** Start web server */
     	run("0.0.0.0", 9999);
     }
 
