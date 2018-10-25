@@ -27,9 +27,7 @@ public class AnalyzeService {
 
 		/** Analyze **/
 		Analyze analyze = new DefaultAnalyze(steps);
-		analyze
-				.getMetadata()
-				.setAudioMetadata(audioMetadata);
+		analyze.getMetadata().setAudioMetadata(audioMetadata);
 		analyze.run();
 		this.all.put(analyze.getUniqueID(), analyze);
 		return true;

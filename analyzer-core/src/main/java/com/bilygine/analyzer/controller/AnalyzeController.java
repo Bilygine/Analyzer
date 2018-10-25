@@ -9,9 +9,9 @@ import com.bilygine.analyzer.io.Json;
 import spark.Request;
 import spark.Spark;
 
-import java.util.Collection;
+import javax.naming.directory.SearchResult;
 import java.util.List;
-import java.util.Set;
+
 
 public class AnalyzeController implements Controller {
 
@@ -21,7 +21,7 @@ public class AnalyzeController implements Controller {
 	@Override
 	public void register() {
 		Spark.post("/analyze/execute", (req, res) -> execute(req), Json::toJson);
-		Spark.get("/analyze", (req, res) -> getAnalyzes(req), Json::toJson);
+		Spark.get("/analyze", (req, res) -> getAnalyzes(), Json::toJson);
 		Spark.get("/analyze/result/:analyzeId", (req, res) -> getResult(req.params("analyzeId")), Json::toJson); //
 	}
 
@@ -40,7 +40,7 @@ public class AnalyzeController implements Controller {
 		return "OK";
 	}
 
-	public List<Analyze> getAnalyzes(Request req) {
+	public List<Analyze> getAnalyzes() {
 		return AnalyzeService.get().getAnalyzes();
 	}
 

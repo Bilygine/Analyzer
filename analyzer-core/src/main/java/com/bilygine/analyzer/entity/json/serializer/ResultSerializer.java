@@ -1,9 +1,7 @@
 package com.bilygine.analyzer.entity.json.serializer;
 
-import com.bilygine.analyzer.analyze.Analyze;
 import com.bilygine.analyzer.analyze.result.Result;
 import com.bilygine.analyzer.analyze.result.ResultColumn;
-import com.bilygine.analyzer.io.Json;
 import com.google.gson.*;
 
 import java.lang.reflect.Type;
@@ -16,10 +14,10 @@ public class ResultSerializer implements JsonSerializer<Result> {
 		for (int lineIndex = 0; lineIndex < result.getMaxColumnSize(); lineIndex++) {
 			JsonObject line = new JsonObject();
 			for (ResultColumn column : result.getResultColumns()) {
-				line.addProperty("name", column.getName());
-				line.addProperty("type", column.getTypeName());
-				line.addProperty("value", column.valueAt(lineIndex).toString());
+				Object value = column.valueAt(lineIndex);
+				line.addProperty(column.getName(), (value == null) ? "null" : value.toString());
 			}
+			array.add(line);
 		}
 		return array;
 	}

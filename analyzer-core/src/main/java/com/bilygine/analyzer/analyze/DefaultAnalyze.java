@@ -2,14 +2,13 @@ package com.bilygine.analyzer.analyze;
 
 import com.bilygine.analyzer.analyze.result.Result;
 import com.bilygine.analyzer.analyze.result.ResultColumn;
-import com.bilygine.analyzer.entity.model.AudioMetadata;
 import com.google.common.util.concurrent.*;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -33,7 +32,7 @@ public class DefaultAnalyze implements Analyze {
     public DefaultAnalyze(List<Step> steps) {
         steps.stream().forEach(step -> { this.steps.put(step, Status.NOT_RUN); });
         this.result = new Result();
-        this.uniqueID = UUID.randomUUID().toString();
+        this.uniqueID = RandomStringUtils.randomAlphabetic(8);
     }
 
     @Override
@@ -100,22 +99,20 @@ public class DefaultAnalyze implements Analyze {
                     DefaultAnalyze.this.result.addColumns(resultColumns);
 					LOGGER.info("[STEP_END] ", currentStep.getName());
 					steps.put(currentStep, Status.SUCCEED);
-					/** Analyze is done */
-                    if(DefaultAnalyze.this.isDone()) {
-                    	executor.shutdown();
-                    	LOGGER.info("Analyze is done");
-					}
+					metadata.setEnd(System.currentTimeMillis());
+					executor.shutdown();
                 }
 
                 @Override
                 public void onFailure(Throwable throwable) {
 					steps.put(currentStep, Status.FAILURE);
                     LOGGER.error(throwable);
+					metadata.setEnd(System.currentTimeMillis());
+					executor.shutdown();
                 }
             }, executor);
         }
 
-		executor.shutdown();
         /** Display concat results */
         DefaultAnalyze.this.result.printResults();
 

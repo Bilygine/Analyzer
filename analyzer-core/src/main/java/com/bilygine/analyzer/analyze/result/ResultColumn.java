@@ -28,7 +28,7 @@ public class ResultColumn<T> {
      * @return type of column
      */
     public String getTypeName() {
-        return this.getClass().getTypeName();
+        return null;
     }
 
     /**
@@ -61,7 +61,7 @@ public class ResultColumn<T> {
      * @return value at Index or null
      */
     public T valueAt(int index) {
-        return (this.values.size() >= index) ? null : this.values.get(index);
+        return (index >= this.values.size()) ? null : this.values.get(index);
     }
 
     /**
