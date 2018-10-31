@@ -99,8 +99,10 @@ public class DefaultAnalyze implements Analyze {
                     DefaultAnalyze.this.result.addColumns(resultColumns);
 					LOGGER.info("[STEP_END] ", currentStep.getName());
 					steps.put(currentStep, Status.SUCCEED);
-					metadata.setEnd(System.currentTimeMillis());
-					executor.shutdown();
+					if (isDone()) {
+						metadata.setEnd(System.currentTimeMillis());
+						executor.shutdown();
+					}
                 }
 
                 @Override
@@ -108,7 +110,10 @@ public class DefaultAnalyze implements Analyze {
 					steps.put(currentStep, Status.FAILURE);
                     LOGGER.error(throwable);
 					metadata.setEnd(System.currentTimeMillis());
-					executor.shutdown();
+					if (isDone()) {
+						metadata.setEnd(System.currentTimeMillis());
+						executor.shutdown();
+					}
                 }
             }, executor);
         }
