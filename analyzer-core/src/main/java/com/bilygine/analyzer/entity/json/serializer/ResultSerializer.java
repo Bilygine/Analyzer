@@ -21,5 +21,12 @@ public class ResultSerializer implements JsonSerializer<Result> {
 		}
 		return array;
 	}
+ /*
 
+ 	{
+
+ 	}
+
+
+  */
 }

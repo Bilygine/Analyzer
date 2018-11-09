@@ -1,21 +1,14 @@
 package com.bilygine.analyzer.entity.json.input;
 
-import com.bilygine.analyzer.entity.model.AudioMetadata;
-
 public class ExecuteAnalyzeInput {
 
-	private String path;
-	private AudioMetadata audioMetadata;
+	private String id;
 
-	public ExecuteAnalyzeInput(String path) {
-		this.path = path;
+	public ExecuteAnalyzeInput(String id) {
+		this.id = id;
 	}
 
-	public String getPath() {
-		return this.path;
-	}
-
-	public AudioMetadata getAudioMetadata() {
-		return this.audioMetadata;
+	public String getID() {
+		return this.id;
 	}
 }

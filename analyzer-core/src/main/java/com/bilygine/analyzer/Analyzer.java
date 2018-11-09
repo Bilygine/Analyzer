@@ -24,7 +24,7 @@ public class Analyzer {
 		Json.init();
 
 		/** Start web server */
-    	run("0.0.0.0", 9999);
+    	run("0.0.0.0", 8080);
     }
 
     public static void run(String host, int port) {

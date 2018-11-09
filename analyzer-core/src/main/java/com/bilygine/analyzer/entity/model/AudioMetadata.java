@@ -9,4 +9,11 @@ public class AudioMetadata {
 	public String getSource() {
 		return this.source;
 	}
+
+	@Override
+	public String toString() {
+		return "AudioMetadata{" +
+				"source='" + source + '\'' +
+				'}';
+	}
 }

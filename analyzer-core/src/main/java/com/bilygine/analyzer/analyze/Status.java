@@ -1,5 +1,9 @@
 package com.bilygine.analyzer.analyze;
 
 public enum Status {
-    NOT_RUN, PROGRESS, SUCCEED, FAILURE
+    WAITING, PROGRESS, SUCCEED, FAILURE;
+
+    public String formatted() {
+        return this.name().toLowerCase();
+    }
 }

@@ -2,6 +2,7 @@ package com.bilygine.analyzer.analyze.steps;
 
 import com.bilygine.analyzer.analyze.Step;
 import com.bilygine.analyzer.analyze.result.ResultColumn;
+import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,7 @@ public abstract class TranscriptionStep implements Step {
         this.words.add(word);
         this.timestamps.add(timestamp);
         return true;
+
     }
 
     /**

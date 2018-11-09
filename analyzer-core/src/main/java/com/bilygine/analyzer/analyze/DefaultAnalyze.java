@@ -21,16 +21,18 @@ public class DefaultAnalyze implements Analyze {
 	/** UUID */
 	private String uniqueID;
     /** Steps status */
-    private HashMap<Step, Status> steps = new HashMap<>();
+    private Map<Step, Status> steps = new HashMap<>();
     /** Result */
     private Result result;
 	/** Metadata */
 	private AnalyzeMetadata metadata = new AnalyzeMetadata();
+
+	private Status currentStatus;
     /**
      * @param steps
      */
     public DefaultAnalyze(List<Step> steps) {
-        steps.stream().forEach(step -> { this.steps.put(step, Status.NOT_RUN); });
+        steps.stream().forEach(step -> { this.steps.put(step, Status.WAITING); });
         this.result = new Result();
         this.uniqueID = RandomStringUtils.randomAlphabetic(8);
     }
@@ -42,16 +44,7 @@ public class DefaultAnalyze implements Analyze {
 
     @Override
     public Status getStatus() {
-    	HashMap<Status, Integer> aggregateStatus = new HashMap<>();
-    	for (Status s : Status.values()) aggregateStatus.put(s, 0);
-    	for (Map.Entry<Step, Status> step : this.steps.entrySet()) {
-    		Status status = step.getValue();
-			aggregateStatus.put(status, aggregateStatus.get(status) + 1);
-		}
-		if (aggregateStatus.get(Status.NOT_RUN) == this.steps.size()) return Status.NOT_RUN;
-		if (aggregateStatus.get(Status.FAILURE) > 0) return Status.FAILURE;
-		if (aggregateStatus.get(Status.SUCCEED) == this.steps.size()) return Status.SUCCEED;
-		return Status.PROGRESS;
+		return currentStatus;
     }
 
     @Override
@@ -61,7 +54,7 @@ public class DefaultAnalyze implements Analyze {
 
     @Override
     public void addStep(Step step) {
-        this.steps.put(step, Status.NOT_RUN);
+        this.steps.put(step, Status.WAITING);
     }
 
     /**
@@ -91,8 +84,10 @@ public class DefaultAnalyze implements Analyze {
         for (Map.Entry<Step, Status> entry : this.steps.entrySet()) {
         	Step currentStep = entry.getKey();
             LOGGER.info("[STEP_START]", currentStep.getName());
+
             ListenableFuture<List<ResultColumn>> listenableFuture = listeningExecutor.submit(currentStep);
 			this.steps.put(currentStep, Status.PROGRESS);
+
             Futures.addCallback(listenableFuture, new FutureCallback<List<ResultColumn>>() {
                 @Override
                 public void onSuccess(@Nullable List<ResultColumn> resultColumns) {

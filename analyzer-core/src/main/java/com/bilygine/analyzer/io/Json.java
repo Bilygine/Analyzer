@@ -1,13 +1,13 @@
 package com.bilygine.analyzer.io;
 
 import com.bilygine.analyzer.analyze.Analyze;
-import com.bilygine.analyzer.analyze.AnalyzeMetadata;
 import com.bilygine.analyzer.analyze.DefaultAnalyze;
 import com.bilygine.analyzer.analyze.result.Result;
 import com.bilygine.analyzer.entity.json.serializer.DefaultAnalyzeSerializer;
+import com.bilygine.analyzer.analyze.AnalyzeMetadata;
 import com.bilygine.analyzer.entity.json.serializer.ResultSerializer;
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
 public class Json {
