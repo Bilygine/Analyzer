@@ -1,6 +1,6 @@
 package com.bilygine.analyzer.analyze;
 
-public enum Status {
+public enum AnalyzeStatus {
     WAITING, PROGRESS, SUCCEED, FAILURE;
 
     public String formatted() {
